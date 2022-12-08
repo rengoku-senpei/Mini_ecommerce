@@ -1,15 +1,37 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { addToDatabase } from '../actions';
+import { fetchData } from '../slice/apiFetchSlice';
 
 const ProductForm = () => {
-  const dispatch = useDispatch();
-  const product = useRef('');
+  // Input Refs
+  const productName = useRef('');
+  const productPrice = useRef('');
+  const productImage = useRef('');
+  const productDesc = useRef('');
 
+  // State,Action Hooks
+  const dispatch = useDispatch();
+  const { categories, subcategories } = useSelector((state) => state.apiData);
+
+  // On Submit Function
   const addProduct = (e) => {
     e.preventDefault();
-    dispatch(addToDatabase('/products', product.current.value));
+    dispatch(
+      addToDatabase('/products', {
+        name: productName.current.value,
+        price: productPrice.current.value,
+        image: productImage.current.value,
+        description: productDesc.current.value,
+      })
+    );
   };
+
+  // Fetching Data From Json
+  useEffect(() => {
+    dispatch(fetchData('categories'));
+    dispatch(fetchData('subcategories'));
+  }, []);
 
   return (
     <div>
@@ -19,11 +41,29 @@ const ProductForm = () => {
         }}
       >
         <div className="form-group">
-          <label>Category</label>
+          <label>Product Name</label>
           <input
             className="form-control"
-            ref={product}
-            placeholder="Enter Product"
+            ref={productName}
+            placeholder="Enter Name"
+          />
+          <label>Product Price</label>
+          <input
+            className="form-control"
+            ref={productPrice}
+            placeholder="Enter Price"
+          />
+          <label>Product Image</label>
+          <input
+            className="form-control"
+            ref={productImage}
+            placeholder="Enter Image Url"
+          />
+          <label>Product Description</label>
+          <input
+            className="form-control"
+            ref={productDesc}
+            placeholder="Enter Description"
           />
         </div>
         <button type="submit" className="btn btn-dark">

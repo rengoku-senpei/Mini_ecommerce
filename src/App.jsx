@@ -13,6 +13,11 @@ import { auth } from './firebase';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { LogInReducer, UserReducer } from './slice/authSlice';
+import styled from 'styled-components';
+
+const OutletContainer = styled.div`
+  flex: 1;
+`;
 
 const App = () => {
   const dispatch = useDispatch();
@@ -40,9 +45,11 @@ const App = () => {
       .catch((e) => console.log(e));
 
   return (
-    <div>
+    <div className="d-flex flex-column min-vh-100">
       <Header onSignOut={signOutFromgoogle} onSignIn={signInWithGoogle} />
-      <Outlet />
+      <OutletContainer>
+        <Outlet />
+      </OutletContainer>
       <Footer />
     </div>
   );
