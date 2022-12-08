@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToDatabase } from '../actions';
 import { fetchData } from '../slice/apiFetchSlice';
 
