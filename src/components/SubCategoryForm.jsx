@@ -13,11 +13,12 @@ const SubCategoryForm = () => {
   useEffect(() => {
     dispatch(fetchData('categories'));
     dispatch(fetchData('subcategories'));
-  }, []);
+  }, [category]);
 
   const addSubCategory = (e) => {
     e.preventDefault();
     const inputValue = subCategory.current.value;
+
     if (
       subcategories
         .map((eachSubCategory) => eachSubCategory.name.toLowerCase())
@@ -74,7 +75,7 @@ const SubCategoryForm = () => {
                 <option value="">Choose Catagory</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.category}
+                    {category.name}
                   </option>
                 ))}
               </select>

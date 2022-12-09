@@ -1,37 +1,33 @@
-import React, { useEffect } from 'react';
-import { useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToDatabase } from '../actions';
 import { fetchData } from '../slice/apiFetchSlice';
 
 const CategoryForm = () => {
   const dispatch = useDispatch();
-  const category = useRef('');
+  const [category, setCategory] = useState('');
   const { categories } = useSelector((state) => state.apiData);
-  console.log(categories);
-
   useEffect(() => {
     dispatch(fetchData('categories'));
-  }, []);
+  }, [category]);
 
   const addCategory = (e) => {
     e.preventDefault();
-    const inputValue = category.current.value;
 
     if (
       categories
-        .map((eachCategory) => eachCategory.category.toLowerCase())
-        .includes(inputValue.toLowerCase())
+        .map((eachCategory) => eachCategory.name.toLowerCase())
+        .includes(category.toLowerCase())
     ) {
       console.log('Already Exists');
     } else {
       dispatch(
         addToDatabase('/categories', {
-          category:
-            inputValue.charAt(0).toUpperCase() +
-            inputValue.slice(1).toLowerCase(),
+          name:
+            category.charAt(0).toUpperCase() + category.slice(1).toLowerCase(),
         })
       );
+      setCategory('');
     }
   };
 
@@ -46,7 +42,10 @@ const CategoryForm = () => {
           <label>Category</label>
           <input
             className="form-control"
-            ref={category}
+            value={category}
+            onChange={(e) => {
+              setCategory(e.target.value);
+            }}
             placeholder="Enter category"
           />
         </div>
