@@ -1,14 +1,36 @@
-import React, { useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToDatabase } from '../actions';
+import { fetchData } from '../slice/apiFetchSlice';
 
 const VariantForm = () => {
   const dispatch = useDispatch();
-  const variant = useRef('');
+  const [variant, setVariant] = useState('');
+
+  const { variants } = useSelector((state) => state.apiData);
+
+  useEffect(() => {
+    dispatch(fetchData('variants'));
+  }, [variant]);
 
   const addVariant = (e) => {
     e.preventDefault();
-    dispatch(addToDatabase('/variants', variant.current.value));
+
+    if (
+      variants
+        .map((eachVariant) => eachVariant.name.toLowerCase())
+        .includes(variant.toLowerCase())
+    ) {
+      console.log('Already Exists');
+    } else {
+      dispatch(
+        addToDatabase('/variants', {
+          name:
+            variant.charAt(0).toUpperCase() + variant.slice(1).toLowerCase(),
+        })
+      );
+      setVariant('');
+    }
   };
 
   return (
@@ -22,7 +44,10 @@ const VariantForm = () => {
           <label>Variant</label>
           <input
             className="form-control"
-            ref={variant}
+            value={variant}
+            onChange={(e) => {
+              setVariant(e.target.value);
+            }}
             placeholder="Enter Variant"
           />
         </div>
