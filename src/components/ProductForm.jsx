@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToDatabase } from '../actions';
 import { fetchData } from '../slice/apiFetchSlice';
 import * as yup from 'yup';
+import { toastOnError, toastOnSuccess } from '../slice/toastSlice';
 
 const ProductForm = () => {
   // Input Refs
@@ -20,13 +21,19 @@ const ProductForm = () => {
 
   // Yup Validation
   let schema = yup.object().shape({
-    name: yup.string().required(),
-    price: yup.number().required().positive(),
-    image: yup.string().required(),
-    description: yup.string().required(),
-    category: yup.number().required(),
-    subcategory: yup.number().required(),
-    variant: yup.object().required(),
+    name: yup.string().required('Name is Required'),
+    price: yup
+      .number()
+      .typeError('Should Be A Number')
+      .required('Price is Required')
+      .positive(),
+    image: yup.string().required('Image is Required'),
+    description: yup.string().required('Description Is Required '),
+    category: yup.number().typeError('Category is Required').required(),
+    subcategory: yup.number().typeError('SubCategory is Required').required(),
+    variant: yup.object().shape({
+      [variant]: yup.array().min(1, 'At least 1').required('required'),
+    }),
   });
 
   // State,Action Hooks
@@ -48,25 +55,30 @@ const ProductForm = () => {
       variant: { [variant]: subVariants },
     };
 
-    schema.isValid(values).then((valid) => {
-      if (valid) {
-        console.log('hi');
-        dispatch(addToDatabase('/products', values));
+    schema
+      .isValid(values)
+      .then((valid) => {
+        if (valid) {
+          dispatch(addToDatabase('/products', values));
+          dispatch(toastOnSuccess('Product Added Successfully'));
 
-        // Resetting The Form
-        productName.current.value = '';
-        productPrice.current.value = '';
-        productImage.current.value = '';
-        productDesc.current.value = '';
-        setCategory('');
-        setVariant('');
-        setSubcategory('');
-        setSubVariant('');
-        setSubVariants([]);
-        setSubCategoryOptions([]);
-        setSubVariantOptions([]);
-      }
-    });
+          // Resetting The Form
+          productName.current.value = '';
+          productPrice.current.value = '';
+          productImage.current.value = '';
+          productDesc.current.value = '';
+          setCategory('');
+          setVariant('');
+          setSubcategory('');
+          setSubVariant('');
+          setSubVariants([]);
+          setSubCategoryOptions([]);
+          setSubVariantOptions([]);
+        } else {
+          dispatch(toastOnError('Enter the required Fields!'));
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
   // Fetching Data From Json
